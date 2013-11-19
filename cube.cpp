@@ -108,8 +108,9 @@ void cube::layer_down()
 	num_layer = num_layer - 1;
 }
 
-void cube::rotate(int c)
+void cube::rotate(int c, int r)
 {
+	//c = center; r = rotation
 	int a, b;
 	int x, y, z;
 	int p[4];

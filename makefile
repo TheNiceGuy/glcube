@@ -22,7 +22,7 @@ glcube.o: glcube.cpp
 
 clean:
 	rm -rf *.o
-	rm -rf *.*~
+	rm -rf *~
 
 mrproper: clean
 	rm -rf $(EXEC)

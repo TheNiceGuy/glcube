@@ -7,13 +7,14 @@ using namespace std;
 
 cube cube;
 camera camera;
+bool render_thread = false;
 
 void init();
 void render();
 
 int main()
 {
-	startTimer(10000);
+	startTimer(17);
 
 	bool sdl_exit = false;
 	SDL_Event event;
@@ -52,7 +53,7 @@ int main()
 void init()
 {	
 	cube.generate();
-	cube.rotate(0);
+	cube.rotate(0, 0);
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();

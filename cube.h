@@ -48,7 +48,7 @@ class cube
 		void draw();
 		void layer_up();
 		void layer_down();
-		void rotate(int c);
+		void rotate(int c, int n);
 
 		~cube();
 

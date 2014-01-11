@@ -1,30 +1,25 @@
-#include "cube.h"
 #include "camera.h"
+#include "cube.h"
 #include "render.h"
 #include "global.h"
 
 using namespace std;
 
-cube cube;
-camera camera;
-bool render_thread = false;
+cube            cube;
+camera          camera;
+bool            render_thread   = false;
+pthread_t       render_pthread;
+pthread_mutex_t render_mutex    = PTHREAD_MUTEX_INITIALIZER;
 
 void init();
 void render();
 
 int main()
 {
-	startTimer(17);
-
 	bool sdl_exit = false;
 	SDL_Event event;
 
-	SDL_Init(SDL_INIT_VIDEO);
- 	SDL_WM_SetCaption("GLCube", NULL);
-	SDL_SetVideoMode(480, 480, 32, SDL_OPENGL); 
-
  	init();
-	render();
 	while (sdl_exit != true)
 	{
 		SDL_WaitEvent(&event);
@@ -36,16 +31,19 @@ int main()
 
 			case SDL_MOUSEBUTTONUP:
 			case SDL_MOUSEBUTTONDOWN:
-				camera.mouseButton(event.button);
+				camera.mouse_button(event.button);
 				break;
 
 			case SDL_MOUSEMOTION:
-				camera.mouseMotion(event.motion);
+				camera.mouse_motion(event.motion);
 				break;
+				
+			case SDL_MOUSEWHEEL:
+				camera.mouse_wheel(event.wheel);
 		}
-		render();
 	}
- 
+	render_thread = false;
+	pthread_join(render_pthread, NULL);
 	SDL_Quit();
 	return 0;
 }
@@ -53,27 +51,12 @@ int main()
 void init()
 {	
 	cube.generate();
-	cube.rotate(0, 0);
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glEnable(GL_DEPTH_TEST);
-	glClearColor(0.1, 0.8, 0.8, 1);
-	gluPerspective(70, 1, 1, 1000);
-}
-
-void render()
-{
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
-	gluLookAt(10, 10, 10, 0, 0, 0, 0, 1, 0);
-
-	cube.draw();
-
-	glFlush();
-	SDL_GL_SwapBuffers();	
+	
+	pthread_create(&render_pthread, NULL, &startTimer, NULL);
+	sleep(1);
+	
+	pthread_mutex_lock(&render_mutex);
+	pthread_mutex_unlock(&render_mutex);
 }
 
 

@@ -1,6 +1,6 @@
 CC = g++
 CFLAGS = -W -Wall -ansi -pedantic -std=c++11
-LDFLAGS = -lSDL -lGL -lGLU
+LDFLAGS = -lSDL -lGL -lGLU -lpthread
 EXEC = glcube
 
 all: $(EXEC) clean

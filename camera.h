@@ -2,12 +2,10 @@
 #define CAMERA_H
 #define _USE_MATH_DEFINES
 
-#include <iostream>
 #include <cmath>
-#include <unistd.h>
-#include <SDL/SDL.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
+
+#include "global.h"
+
 
 inline float degToRad(float x)
 {
@@ -19,23 +17,25 @@ class camera
 	public:
 		camera();
  
-		uint16_t mouseMotion(const SDL_MouseMotionEvent &event);
-		uint16_t mouseButton(const SDL_MouseButtonEvent &event);
-		uint16_t keyboardInput(const SDL_KeyboardEvent &event); 
-		uint16_t setCamera();
-		uint16_t setMotionSensivity(double sensivity);
-		uint16_t setScrollSensivity(double sensivity);
-
+		uint16_t mouse_motion(const SDL_MouseMotionEvent &event);
+		uint16_t mouse_button(const SDL_MouseButtonEvent &event);
+		uint16_t mouse_wheel(const SDL_MouseWheelEvent &event);
+		uint16_t keyboard_input(const SDL_KeyboardEvent &event); 
+		uint16_t set_camera();
+		uint16_t set_motion_sensitity(double sens);
+		uint16_t set_scroll_sensitity(double sens);
+		uint16_t move_camera();
+		
 		~camera();
 
 	private:
-		double MouseSpeed;
-		double ScrollSpeed;
-		double Distance;
-		double AngleY;
-		double AngleZ;
-		bool LeftButton;
-		bool RightButton;
+		double distance;
+		double mouse_speed;
+		double scroll_speed;
+		double angle[2];
+		double pos[2];
+		bool left_button;
+		bool right_button;
 };
 
 #endif

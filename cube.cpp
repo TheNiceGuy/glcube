@@ -1,5 +1,4 @@
 #include "cube.h"
-#include "global.h"
 
 using namespace std;
 
@@ -29,6 +28,12 @@ void cube::generate()
 		cubes[a].pos[0] = x;
 		cubes[a].pos[1] = y;
 		cubes[a].pos[2] = z;
+
+		cubes[a].type = test_corner(x, y, z);
+		if(cubes[a].type != 1)
+		{
+			cubes[a].type = test_edge(x, y, z);
+		}
 
 		// inner pieces
 		if(x!=0 and x!=(num_layer-1) and
@@ -88,6 +93,7 @@ void cube::draw()
 	{
 		if(cubes[a].isrotating != 6)
 		{
+			//To be added
 		}
 		glPushMatrix();
 		glTranslatef(-(num_layer/2.0)+cubes[a].pos[0],
@@ -108,23 +114,21 @@ void cube::layer_down()
 	num_layer = num_layer - 1;
 }
 
-void cube::rotate(int c, int r)
+void cube::rotate_front(int r)
 {
-	//c = center; r = rotation
 	int a, b;
-	int x, y, z;
-	int p[4];
-
-	a = pow(num_layer, 2);
-
-	int *side;
-	side = new (nothrow) int[a];
-
 	
-
-	x = 0;
-	y = 0;
-	z = 0;
+	a = 0;
+	b = 0;
+	
+	while(b<4)
+	{
+		if(cubes[a].pos[0] == 0 and
+		   cubes[a].pos[1] == 0 and
+		   cubes[a].pos[2] == 0)
+		{
+		}
+	}	
 }
 
 cube::~cube()
@@ -152,6 +156,35 @@ void cube::draw_cube(int index)
 		glEnd();
 	}
 }
+
+int cube::test_corner(int x, int y, int z)
+{
+	int result;
+	result = 3;
+	
+	if((x == 0 or x == (num_layer-1)) and
+	   (y == 0 or y == (num_layer-1)) and
+	   (z == 0 or z == (num_layer-1)))
+	{
+		result = 1;
+	}
+	
+	return 1;
+}
+
+int cube::test_edge(int x, int y, int z)
+{
+	bool result;
+	result = false;
+	
+	
+}
+
+void cube::swap_pieces(int a, int b)
+{
+
+}
+
 
 
 

@@ -1,38 +1,71 @@
 #include "camera.h"
-#include "global.h"
 
 using namespace std;
 
 camera::camera()
 {
-	MouseSpeed  = 0.3;
-	ScrollSpeed = 1;
-	Distance    = 10;
-	AngleY      = 0;
-	AngleZ      = 0;
-	LeftButton  = false;
-	RightButton = false;
+	mouse_speed  = 0.3;
+	scroll_speed = 1;
+	distance     = 5;
+	left_button  = false;
+	right_button = false;
+	for(int i = 0; i<2; i++)
+	{
+		angle[i] = 0;
+		pos[i]   = 0;
+	}
 }
 
-uint16_t camera::mouseMotion(const SDL_MouseMotionEvent &event)
+uint16_t camera::mouse_motion(const SDL_MouseMotionEvent &event)
 {
-	if(LeftButton == true)
-	{
-		cout << event.xrel << " " << event.yrel << endl;
+	if(left_button == true)
+	{	
+		angle[0] = angle[0] + event.xrel;
+		angle[1] = angle[1] + event.yrel;
+		for(int i = 0; i < 2; i++)
+		{
+			if(angle[i] >= 360)
+				angle[i] = angle[i] - 360;
+			else if(angle[i] <= -360)
+				angle[i] = angle[i] + 360;
+		}
+		pos[0] = distance * cos(angle[1]*M_PI/180);
+		pos[1] = distance * sin(angle[1]*M_PI/180);
 	}
 	return 0;
 }
 
-uint16_t camera::mouseButton(const SDL_MouseButtonEvent &event)
+uint16_t camera::mouse_button(const SDL_MouseButtonEvent &event)
 {
 	if(event.state == SDL_PRESSED)
 	{
-		LeftButton = true;	
+		left_button = true;	
 	}
 	else
 	{
-		LeftButton = false;
+		left_button = false;
 	}
+	return 0;
+}
+
+uint16_t camera::mouse_wheel(const SDL_MouseWheelEvent &event)
+{
+	distance = distance + event.y;
+	cout << event.x << " " << event.y << endl;
+
+	return 0;
+}
+
+uint16_t camera::move_camera()
+{
+	if((angle[1] <= 90 and angle[1] >= -90) or
+		angle[1] > 270 or angle[1] < -270)
+		gluLookAt(pos[0], pos[1], 0, 0, 0, 0, 0, 1, 0);	
+	else
+		gluLookAt(pos[0], pos[1], 0, 0, 0, 0, 0,-1, 0);
+	
+	glRotated(angle[0], 0, 1, 0);
+	
 	return 0;
 }
 

@@ -1,13 +1,10 @@
 #ifndef CUBE_H
 #define CUBE_H
 
-#include <iostream>
 #include <cmath>
 #include <new>
-#include <unistd.h>
-#include <SDL/SDL.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
+
+#include "global.h"
 
 const uint8_t colorScheme[7][3] =  {{  0,   0,   0},  //0 Black
 									{255, 255, 255},  //1 White
@@ -36,6 +33,7 @@ struct cubies
 	uint8_t color[6]   = {1, 2, 3, 4, 5, 6};
 	uint8_t rot[3]     = {0, 0, 0};
 	uint8_t pos[3]     = {0, 0, 0};
+	uint8_t type       = 0; //0 = center; 1 = edge; 2 = corner
 	uint8_t isrotating = 3;
 };
 
@@ -48,19 +46,22 @@ class cube
 		void draw();
 		void layer_up();
 		void layer_down();
-		void rotate(int c, int n);
+		void rotate_front(int r);
 
 		~cube();
 
 	private:
 		uint8_t color[6]         = {0, 0, 0, 0, 0, 0}; //F B T D R L
-		uint8_t center[6]        = {0, 0, 0, 0, 0, 0}; //F B T D R L (undeterminated)
+		uint8_t center[6]        = {0, 0, 0, 0, 0, 0}; //F B T D R L (color undeterminated)
 		uint8_t num_layer        = 3;
 		uint8_t side_rotating    = 6;
 		double  side_rotation[6] = {0, 0, 0, 0, 0, 0};
 		cubies *cubes;
 
 		void draw_cube(int index);
+		void swap_pieces(int a, int b);
+		int test_corner(int x, int y, int z);
+		int test_edge(int x, int y, int z);
 };
 
 #endif

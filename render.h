@@ -1,12 +1,12 @@
 #ifndef RENDER_H
 #define RENDER_H
 
-#include <iostream>
-#include <unistd.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
+#include "camera.h"
+#include "cube.h"
+#include "global.h"
 
-void startTimer(int interval);
+void *startTimer(void*);
+void render();
 
 #endif
 

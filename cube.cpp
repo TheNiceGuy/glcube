@@ -2,10 +2,6 @@
 
 using namespace std;
 
-cube::cube()
-{
-}
-
 void cube::generate()
 {
 	int a, b, c;
@@ -131,12 +127,13 @@ void cube::rotate_front(int r)
 	}	
 }
 
-cube::~cube()
+//////////////////////
+// private function //
+//////////////////////
+
+cube::cube()
 {
-
 }
-
-// private function 
 
 void cube::draw_cube(int index)
 {
@@ -185,6 +182,10 @@ void cube::swap_pieces(int a, int b)
 
 }
 
+cube::~cube()
+{
+
+}
 
 
 

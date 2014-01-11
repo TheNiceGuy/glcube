@@ -36,6 +36,8 @@ class camera
 		double pos[2];
 		bool left_button;
 		bool right_button;
+		
+		uint16_t update_pos();
 };
 
 #endif

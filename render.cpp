@@ -7,6 +7,8 @@ extern camera          camera;
 extern bool            render_thread;
 extern pthread_mutex_t render_mutex;
 
+SDL_Window *screen;
+
 void *startTimer(void*)
 {
 	int time       = 0;
@@ -19,14 +21,15 @@ void *startTimer(void*)
 		printf("Unable to initialize SDL: %s", SDL_GetError());
 		exit(EXIT_FAILURE);
 	}
-	if(SDL_SetVideoMode(480, 480, 16, SDL_OPENGL) == NULL)
+	screen = SDL_CreateWindow("GLCube", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+							  640, 640, SDL_WINDOW_OPENGL);
+	if(screen == NULL)
 	{
-		printf("Can't load video mode: %s\n", SDL_GetError());
+		printf("Can't create SDL window: %s\n", SDL_GetError());
 		exit(EXIT_FAILURE);
 	}
-	glEnable(GL_TEXTURE_2D);
+	SDL_GL_CreateContext(screen);
 	glEnable(GL_DEPTH_TEST);
-	SDL_WM_SetCaption("GLCube", NULL);
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	pthread_mutex_unlock(&render_mutex);
@@ -61,5 +64,5 @@ void render()
 	cube.draw();
 	
 	glFlush();
-	SDL_GL_SwapBuffers();	
+	SDL_GL_SwapWindow(screen);	
 }

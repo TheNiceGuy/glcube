@@ -29,11 +29,14 @@ class camera
 		~camera();
 
 	private:
+		const int distance_min = 5;
+		const int distance_max = 20;
 		double distance;
 		double mouse_speed;
 		double scroll_speed;
 		double angle[2];
 		double pos[2];
+		bool flip_rotation;
 		bool left_button;
 		bool right_button;
 		

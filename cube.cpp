@@ -174,7 +174,7 @@ int cube::test_edge(int x, int y, int z)
 	bool result;
 	result = false;
 	
-	
+	return 0;
 }
 
 void cube::swap_pieces(int a, int b)

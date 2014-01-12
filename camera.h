@@ -25,11 +25,12 @@ class camera
 		uint16_t set_motion_sensitity(double sens);
 		uint16_t set_scroll_sensitity(double sens);
 		uint16_t move_camera();
+		uint16_t reset_camera();
 		
 		~camera();
 
 	private:
-		const int distance_min = 5;
+		const int distance_min = 6;
 		const int distance_max = 20;
 		double distance;
 		double mouse_speed;

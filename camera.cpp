@@ -6,7 +6,11 @@ uint16_t camera::mouse_motion(const SDL_MouseMotionEvent &event)
 {
 	if(left_button == true)
 	{	
-		angle[1] = angle[1] + event.yrel;
+		if(flip_rotation == false)
+			angle[0] = angle[0] + (event.xrel * mouse_speed);
+		else
+			angle[0] = angle[0] - (event.xrel * mouse_speed);
+		angle[1] = angle[1] + (event.yrel * mouse_speed);
 		for(int i = 0; i < 2; i++)
 		{
 			if(angle[i] >= 360)
@@ -14,10 +18,6 @@ uint16_t camera::mouse_motion(const SDL_MouseMotionEvent &event)
 			else if(angle[i] <= -360)
 				angle[i] = angle[i] + 360;
 		}
-		if(flip_rotation == false)
-			angle[0] = angle[0] + event.xrel;
-		else
-			angle[0] = angle[0] - event.xrel;
 	}
 	return 0;
 }
@@ -70,6 +70,13 @@ uint16_t camera::move_camera()
 	return 0;
 }
 
+uint16_t camera::reset_camera()
+{
+	angle[0] = 45;
+	angle[1] = 45;
+	distance = distance_min;
+}
+
 //////////////////////
 // private function //
 //////////////////////
@@ -77,7 +84,7 @@ uint16_t camera::move_camera()
 camera::camera()
 {
 	distance      = distance_min;
-	mouse_speed   = 0.3;
+	mouse_speed   = 0.4;
 	scroll_speed  = 1;
 	flip_rotation = false;
 	left_button   = false;

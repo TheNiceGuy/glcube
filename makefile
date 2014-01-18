@@ -1,28 +1,28 @@
 CC = g++
-CFLAGS = -W -Wall -ansi -pedantic -std=c++11
-LDFLAGS = -lSDL2 -lGL -lGLU -lpthread
+CFLAGS = -W -Wall -ansi -pedantic -std=gnu++11
+LDFLAGS = -lSDL2 -lSDL2_ttf -lGL -lGLU -lpthread
 EXEC = glcube
 
 all: $(EXEC) clean
 
-$(EXEC): cube.o camera.o render.o glcube.o
-	$(CC) -o bin/$(EXEC) cube.o camera.o render.o glcube.o $(LDFLAGS)
+$(EXEC): src/cube.o src/camera.o src/render.o src/glcube.o
+	$(CC) -o bin/$(EXEC) src/cube.o src/camera.o src/render.o src/glcube.o $(LDFLAGS)
 
-cube.o: cube.cpp
-	$(CC) -o cube.o -c cube.cpp $(CFLAGS)
+cube.o: src/cube.cpp
+	$(CC) -o src/cube.o -c src/cube.cpp $(CFLAGS)
 
-camera.o: camera.cpp
-	$(CC) -o camera.o -c camera.cpp $(CFLAGS)
+camera.o: src/camera.cpp
+	$(CC) -o src/camera.o -c src/camera.cpp $(CFLAGS)
 
-render.o: render.cpp
-	$(CC) -o render.o -c render.cpp  $(CFLAGS)
+render.o: src/render.cpp
+	$(CC) -o src/render.o -c src/render.cpp  $(CFLAGS)
 
-glcube.o: glcube.cpp
-	$(CC) -o glcube.o -c glcube.cpp  $(CFLAGS)
+glcube.o: src/glcube.cpp
+	$(CC) -o src/glcube.o -c src/glcube.cpp  $(CFLAGS)
 
 clean:
-	rm -rf *.o
-	rm -rf *~
+	rm -rf src/*.o
+	rm -rf src/*~
 
 mrproper: clean
-	rm -rf $(EXEC)
+	rm -rf bin/$(EXEC)

@@ -85,7 +85,7 @@ uint16_t camera::reset_camera()
 
 camera::camera()
 {
-	distance_min  = 7;
+	distance_min  = 10;
 	distance_max  = 50;
 	distance      = distance_min;
 	mouse_speed   = 0.4;

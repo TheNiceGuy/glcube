@@ -14,6 +14,7 @@ void window_fullscreen();
 void get_display();
 void font_render();
 void draw_grid(int n, float s);
+void toggle_grid();
 
 #endif
 

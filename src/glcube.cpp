@@ -46,8 +46,18 @@ int main()
 					case SDLK_f:
 						window_fullscreen();
 						break;
+					case SDLK_g:
+						toggle_grid();
+						break;
 					case SDLK_HOME:
 						camera.reset_camera();
+						break;
+					case SDLK_PAGEUP:
+						cube.layer_up();
+						break;
+					case SDLK_PAGEDOWN:
+						cube.layer_down();
+						break;
 				}	
 				break;
 			

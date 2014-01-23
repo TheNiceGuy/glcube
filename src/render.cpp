@@ -11,6 +11,7 @@ extern camera          camera;
 
 SDL_Window *window;
 SDL_GLContext window_glcontext;
+bool render_grid = true;
 
 void render_init()
 {
@@ -100,8 +101,10 @@ void window_render()
 	window_resize(resolution_x, resolution_y);
 
 	camera.move_camera();
-	draw_grid(20, 1);
-	cube.draw();
+	if(render_grid == true)
+		draw_grid(20, 1);
+	if(cube.is_lock() == false)
+		cube.draw();
 	//font_render();
 	
 	glFlush();
@@ -200,6 +203,13 @@ void draw_grid(int n, float s)
 	glPopMatrix();
 }
 
+void toggle_grid()
+{
+	if(render_grid == true)
+		render_grid = false;
+	else
+		render_grid = true;
+}
 
 
 

@@ -6,6 +6,15 @@
 
 #include "global.h"
 
+enum piece_type
+{
+	CENTER,
+	CORNER,
+	SIDE,
+	MIDDLE,
+	UNDEF
+};
+
 const uint8_t colorScheme[7][3] =  {{  0,   0,   0},  //0 Black
 									{255, 255, 255},  //1 White
 									{255, 255,   0},  //2 Yellow
@@ -33,7 +42,7 @@ struct cubies
 	uint8_t color[6];   //1, 2, 3, 4, 5, 6
 	uint8_t rot[3];
 	uint8_t pos[3];
-	uint8_t type;       //0 = center; 1 = edge; 2 = corner
+	uint8_t type;       //enum piece_type
 	uint8_t isrotating;
 	
 	cubies()
@@ -56,15 +65,17 @@ class cube
 	public:
 		cube();
 
+		bool is_lock();
 		void generate();
 		void draw();
 		void layer_up();
 		void layer_down();
 		void rotate_front(int r);
-void inset_square(int x[4], int y[4], int z[4]);
+
 		~cube();
 
 	private:
+		bool lock;
 		uint8_t color[6];  //F B T D R L
 		uint8_t center[6]; //F B T D R L (color undeterminated)
 		uint8_t num_layer;
@@ -75,9 +86,8 @@ void inset_square(int x[4], int y[4], int z[4]);
 
 		void draw_cube(int index);
 		void swap_pieces(int a, int b);
-		
-		int test_corner(int x, int y, int z);
-		int test_edge(int x, int y, int z);
+		void inset_square(int x[4], int y[4], int z[4]);
+		uint8_t test_piece(int x, int y, int z, int a);
 };
 
 #endif

@@ -2,4 +2,4 @@
 *.h~
 *.o
 makefile~
-bin/shooter
+bin/glcube

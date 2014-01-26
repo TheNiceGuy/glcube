@@ -15,6 +15,22 @@ enum piece_type
 	UNDEF
 };
 
+enum face
+{
+	FRONT,
+	BACK,
+	TOP,
+	BOTTOM,
+	RIGHT,
+	LEFT
+};
+
+enum rotation
+{
+	CLOCKWISE,
+	COUNTER_CLOCKWISE
+};
+
 const uint8_t colorScheme[7][3] =  {{  0,   0,   0},  //0 Black
 									{255, 255, 255},  //1 White
 									{255, 255,   0},  //2 Yellow
@@ -22,14 +38,22 @@ const uint8_t colorScheme[7][3] =  {{  0,   0,   0},  //0 Black
 									{  0, 255,   0},  //4 Green
 									{255,   0,   0},  //5 red
 									{255, 155,   0}}; //6 Orange
-const uint8_t CUBEVER[8][3]     =  {{0, 0, 0},
+/*const uint8_t CUBEVER[8][3]     =  {{0, 0, 0},
 									{1, 0, 0},
 									{1, 1, 0},
 									{0, 1, 0},
 									{0, 0, 1},
 									{1, 0, 1},
 									{1, 1, 1},
-									{0, 1, 1}};
+									{0, 1, 1}};*/
+const float CUBEVER[8][3]     =    {{-0.5,-0.5,-0.5},
+									{ 0.5,-0.5,-0.5},
+									{ 0.5, 0.5,-0.5},
+									{-0.5, 0.5,-0.5},
+									{-0.5,-0.5, 0.5},
+									{ 0.5,-0.5, 0.5},
+									{ 0.5, 0.5, 0.5},
+									{-0.5, 0.5, 0.5}};
 const uint8_t CUBEFACE[6][4]    =  {{4, 5, 6, 7},
 									{0, 1, 2, 3},
 									{3, 2, 6, 7},
@@ -40,21 +64,19 @@ const uint8_t CUBEFACE[6][4]    =  {{4, 5, 6, 7},
 struct cubies
 {
 	uint8_t color[6];   //1, 2, 3, 4, 5, 6
-	uint8_t rot[3];
+	uint16_t rot[3];
 	uint8_t pos[3];
 	uint8_t type;       //enum piece_type
 	uint8_t isrotating;
 	
 	cubies()
 	{
-		int a;
-		for(a = 0; a<6; a++)
-			color[a] = 0;
-		for(a = 0; a<6; a++)
-		{
-			rot[a] = 0;
-			pos[a] = 0;
-		}
+		color[0] = 0;
+		color[1] = 0;
+		color[2] = 0;
+		color[3] = 0;
+		color[4] = 0;
+		color[5] = 0;
 		type       = 0;
 		isrotating = 3;
 	}
@@ -70,7 +92,7 @@ class cube
 		void draw();
 		void layer_up();
 		void layer_down();
-		void rotate_front(int r);
+		void rotate(int face, int rot, int offset);
 
 		~cube();
 
@@ -82,11 +104,14 @@ class cube
 		uint8_t side_rotating;
 		float sti_mar;
 		float side_rotation[6];
+		int *cubes_index;
 		cubies *cubes;
 
 		void draw_cube(int index);
+		void draw_guide();
+		void inset_square(float x[4], float y[4], float z[4]);
 		void swap_pieces(int a, int b);
-		void inset_square(int x[4], int y[4], int z[4]);
+		
 		uint8_t test_piece(int x, int y, int z, int a);
 };
 

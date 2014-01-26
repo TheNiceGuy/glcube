@@ -18,7 +18,9 @@ void cube::generate()
 
 	// pointer to the cubies table
 	delete [] cubes;
+	delete [] cubes_index;
 	cubes = new (nothrow) cubies[cube_count];
+	cubes_index = new (nothrow) int[cube_count];
 
 	// generating base puzzle
 	a = 0;
@@ -30,6 +32,10 @@ void cube::generate()
 		cubes[a].pos[0] = x;
 		cubes[a].pos[1] = y;
 		cubes[a].pos[2] = z;
+		cubes[a].rot[0] = 0;
+		cubes[a].rot[1] = 0;
+		cubes[a].rot[2] = 0;
+		cubes_index[a] = a;
 		
 		// set color
 		if(z == num_layer-1)
@@ -74,10 +80,11 @@ void cube::draw()
 	{
 		if(cubes[a].type != UNDEF)
 		{
-			glPushMatrix();
+			glPushMatrix();			
 			glTranslatef(-(num_layer/2.0)+cubes[a].pos[0],
-						-(num_layer/2.0)+cubes[a].pos[1],
-						-(num_layer/2.0)+cubes[a].pos[2]);
+						 -(num_layer/2.0)+cubes[a].pos[1],
+						 -(num_layer/2.0)+cubes[a].pos[2]);
+			glRotatef(cubes[a].rot[2], 0, 0, -1);
 			draw_cube(a);
 			glPopMatrix();
 		}
@@ -88,6 +95,13 @@ void cube::layer_up()
 {
 	num_layer = num_layer + 1;
 	generate();
+	
+rotate(BACK, CLOCKWISE, 0);
+rotate(BACK, CLOCKWISE, 0);
+rotate(BACK, CLOCKWISE, 0);
+rotate(BACK, CLOCKWISE, 2);
+rotate(BACK, CLOCKWISE, 4);
+rotate(BACK, CLOCKWISE, num_layer-1);
 }
 
 void cube::layer_down()
@@ -98,21 +112,72 @@ void cube::layer_down()
 	generate();
 }
 
-void cube::rotate_front(int r)
+void cube::rotate(int face, int rot, int offset)
 {
-	int a, b;
+	bool rotated;
+	int pos[3];
+	int index[2];
+	int a, b, c;
+	int x, y, z;
+	int swap_level, swap_number;
 	
-	a = 0;
-	b = 0;
+	a = num_layer-1;
+	rotated = false;
+	index[0] = 0;
+	if(offset == 0)
+		swap_level = floor(num_layer/2);
+	else
+		swap_level = 1;
 	
-	while(b<4)
+	while(swap_level>0)
 	{
-		if(cubes[a].pos[0] == 0 and
-		   cubes[a].pos[1] == 0 and
-		   cubes[a].pos[2] == 0)
-		{
+		index[1]    = 0;
+		swap_number = a-(2*index[0]);
+		while(swap_number>0)
+		{	
+			if(face == BACK)
+			{
+				swap_pieces((index[0]+index[1])+
+                            (index[0])*num_layer+
+				            (offset)*num_layer*num_layer,
+				
+				            (a-index[0])+
+				            (index[0]+index[1])*num_layer+
+				            (offset)*num_layer*num_layer);
+
+				swap_pieces((a-index[0])+
+				            (index[0]+index[1])*num_layer+
+				            (offset)*num_layer*num_layer,
+				
+				            (a-index[0]-index[1])+
+				            (a-index[0])*num_layer+
+				            (offset)*num_layer*num_layer);
+
+				swap_pieces((a-index[0]-index[1])+
+				            (a-index[0])*num_layer+
+				            (offset)*num_layer*num_layer,
+				
+				            (index[0])+
+							(a-index[0]-index[1])*num_layer+
+							(offset)*num_layer*num_layer);
+				if(rotated == false)
+				{
+					rotated = true;
+					for(x = 0; x<num_layer; x++)
+					{
+						for(y = 0; y<num_layer; y++)
+						{
+							cubes[x+y*num_layer+offset*num_layer*num_layer].rot[2] = cubes[x+y*num_layer+offset*num_layer*num_layer].rot[2]+90;
+						}
+					}
+				}
+			}
+			index[1]++;
+			swap_number--;
 		}
-	}	
+		index[0]++;
+		swap_level--;
+	}
 }
 
 //////////////////////
@@ -129,8 +194,8 @@ cube::cube()
 		center[a]        = 0;
 		side_rotation[a] = 0;
 	}
-	num_layer     = 5;
-	sti_mar       = 0.1;
+	num_layer     = 8;
+	sti_mar       = 0.15;
 	side_rotating = 6;
 	generate();
 }
@@ -138,7 +203,7 @@ cube::cube()
 void cube::draw_cube(int index)
 {
 	int a, b;
-	int x[4], y[4], z[4];
+	float x[4], y[4], z[4];
 	
 	for(a=0; a<6; a++)
 	{
@@ -168,69 +233,92 @@ void cube::draw_cube(int index)
 	}
 }
 
-void cube::inset_square(int x[4], int y[4], int z[4])
+void cube::draw_guide()
 {
-	int a, b;
-	int c[3];
-	int delta[2][3];
-	double vector_length;
-	double vector_angle[3];
-	double pos[3];
-	double point[4][3];
+	glBegin(GL_LINES);
+		glColor3ub(255,255,255);
+		glVertex3f(0, 0, 0);
+		glVertex3f(2, 0, 0);
 
-	glPushMatrix();
-	glTranslatef(x[0], y[0], z[0]);
+		glVertex3f(0, 0, 0);
+		glVertex3f(0, 2, 0);
 
-	c[0] = x[0];
-	c[1] = y[0];
-	c[2] = z[0];
+		glVertex3f(0, 0, 0);
+		glVertex3f(0, 0, 2);
+	glEnd();
+}
+
+void cube::inset_square(float x[4], float y[4], float z[4])
+{
+	int a;
+	float mar;
+	float m[3];
+	float t[3];
+	float i[4][3];
+
+	t[0] = x[0];
+	t[1] = y[0];
+	t[2] = z[0];
+	
 	for(a = 0; a<4; a++)
 	{
-		x[a] = x[a]-c[0];
-		y[a] = y[a]-c[1];
-		z[a] = z[a]-c[2];
+		x[a] = x[a] - t[0];
+		y[a] = y[a] - t[1];
+		z[a] = z[a] - t[2];
 	}
 	
-	for(a = 0; a<2; a++)
+	m[0] = (x[0]+x[1]+x[2]+x[3])/4;
+	m[1] = (y[0]+y[1]+y[2]+y[3])/4;
+	m[2] = (z[0]+z[1]+z[2]+z[3])/4;
+
+	for(a = 0; a<4; a++)
 	{
-		delta[a][0] = x[2+a]-x[0+a];
-		delta[a][1] = y[2+a]-y[0+a];
-		delta[a][2] = z[2+a]-z[0+a];
-
-		vector_length = sqrt(pow(delta[a][0], 2) + pow(delta[a][1], 2) + pow(delta[a][2], 2));
-
-		for(b = 0; b<3; b++)
-		{
-			vector_angle[b] = acos(delta[a][b]/vector_length);
-
-			point[0+a][b] = sti_mar*cos(vector_angle[b]);
-			point[2+a][b] = (vector_length-sti_mar)*cos(vector_angle[b]);
-
-			if(a == 1 and delta[a][b] != delta[a-1][b]) 
-			{
-				point[0+a][b] = point[0+a][b] - delta[a][b];
-				point[2+a][b] = point[2+a][b] - delta[a][b];
-			}
-		}
+		x[a] = x[a] - m[0];
+		y[a] = y[a] - m[1];
+		z[a] = z[a] - m[2];
 	}
-	glBegin(GL_QUADS);
-		glVertex3f(point[0][0], point[0][1], point[0][2]);
-		glVertex3f(point[1][0], point[1][1], point[1][2]);
-		glVertex3f(point[2][0], point[2][1], point[2][2]);
-		glVertex3f(point[3][0], point[3][1], point[3][2]);
+	
+	glPushMatrix();
+	glTranslatef(t[0]+m[0], t[1]+m[1], t[2]+m[2]);
 
-		glColor3ub(0, 0, 0);
-		for(a = 0; a<3; a++)
-		{		
-			glVertex3f(x[a], y[a], z[a]);
-			glVertex3f(x[a+1], y[a+1], z[a+1]);
-			glVertex3f(point[a+1][0], point[a+1][1], point[a+1][2]);
-			glVertex3f(point[a][0], point[a][1], point[a][2]);	
-		}
+	m[0] = 0;
+	m[1] = 0;
+	m[2] = 0;
+
+	mar = 1-sti_mar;
+	for(a = 0; a<4; a++)
+	{
+		i[a][0] = (x[a]-m[0])*mar;
+		i[a][1] = (y[a]-m[1])*mar;
+		i[a][2] = (z[a]-m[2])*mar;
+	}
+	
+	glBegin(GL_QUADS);
+		glVertex3f(i[0][0], i[0][1], i[0][2]);
+		glVertex3f(i[1][0], i[1][1], i[1][2]);
+		glVertex3f(i[2][0], i[2][1], i[2][2]);
+		glVertex3f(i[3][0], i[3][1], i[3][2]);
+		//glEnd();draw_guide();glBegin(GL_QUADS);
+		glColor3ub(0,0,0);
+		glVertex3f(x[0], y[0], z[0]);
+		glVertex3f(x[1], y[1], z[1]);
+		glVertex3f(i[1][0], i[1][1], i[1][2]);
+		glVertex3f(i[0][0], i[0][1], i[0][2]);
+
+		glVertex3f(x[1], y[1], z[1]);
+		glVertex3f(x[2], y[2], z[2]);
+		glVertex3f(i[2][0], i[2][1], i[2][2]);
+		glVertex3f(i[1][0], i[1][1], i[1][2]);
+
+		glVertex3f(x[2], y[2], z[2]);
+		glVertex3f(x[3], y[3], z[3]);
+		glVertex3f(i[3][0], i[3][1], i[3][2]);
+		glVertex3f(i[2][0], i[2][1], i[2][2]);
+
 		glVertex3f(x[3], y[3], z[3]);
 		glVertex3f(x[0], y[0], z[0]);
-		glVertex3f(point[0][0], point[0][1], point[0][2]);
-		glVertex3f(point[3][0], point[3][1], point[3][2]);	
+		glVertex3f(i[0][0], i[0][1], i[0][2]);
+		glVertex3f(i[3][0], i[3][1], i[3][2]);
 	glEnd();
 	glPopMatrix();
 }
@@ -301,16 +389,21 @@ uint8_t cube::test_piece(int x, int y, int z, int a)
 
 void cube::swap_pieces(int a, int b)
 {
-
+	int c, d;
+	
+	for(c = 0; c<3; c++)
+	{
+		d = cubes[cubes_index[a]].pos[c];
+		cubes[cubes_index[a]].pos[c] = cubes[cubes_index[b]].pos[c];
+		cubes[cubes_index[b]].pos[c] = d;
+		d = cubes_index[a];
+		cubes_index[a] = cubes_index[b];
+		cubes_index[b] = d;
+	}
 }
 
 cube::~cube()
 {
 	free(cubes);
+	free(cubes_index);
 }
-
-
-
-
-
-

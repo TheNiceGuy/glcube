@@ -107,6 +107,8 @@ void window_render()
 		cube.draw();
 	//font_render();
 	
+	float x[4], y[4], z[4];
+
 	glFlush();
 	SDL_GL_SwapWindow(window);	
 }

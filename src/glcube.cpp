@@ -103,11 +103,3 @@ void init()
 	pthread_mutex_lock(&render_mutex);
 	pthread_mutex_unlock(&render_mutex);
 }
-
-
-
-
-
-
-
-

@@ -212,8 +212,3 @@ void toggle_grid()
 	else
 		render_grid = true;
 }
-
-
-
-
-

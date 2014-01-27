@@ -17,13 +17,3 @@ void draw_grid(int n, float s);
 void toggle_grid();
 
 #endif
-
-
-
-
-
-
-
-
-
-

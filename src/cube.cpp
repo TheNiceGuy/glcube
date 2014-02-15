@@ -73,7 +73,8 @@ void cube::draw()
 {
 	int a;
 	int cube_count;
-
+	float matrix[16];
+	
 	cube_count = pow(num_layer, 3);
 
 	for(a=0; a<cube_count; a++)
@@ -84,9 +85,8 @@ void cube::draw()
 			glTranslatef(-(num_layer/2.0)+cubes[a].pos[0],
 						 -(num_layer/2.0)+cubes[a].pos[1],
 						 -(num_layer/2.0)+cubes[a].pos[2]);
-			glRotatef(cubes[a].rot[0], 1, 0, 0);
-			//glRotatef(cubes[a].rot[1], 0, 1, 0);
-			glRotatef(cubes[a].rot[2], 0, 0, 1);
+
+			glMultMatrixf(cubes[a].mat.mat);
 			//draw_guide();
 			draw_cube(a);
 			glPopMatrix();
@@ -98,29 +98,8 @@ void cube::layer_up()
 {
 	num_layer = num_layer + 1;
 	generate();
-rotate(LEFT, CLOCKWISE, 0);
-rotate(LEFT, CLOCKWISE, 0);
-rotate(LEFT, CLOCKWISE, 2);
-rotate(LEFT, CLOCKWISE, 2);
-rotate(LEFT, CLOCKWISE, 4);
-rotate(LEFT, CLOCKWISE, 4);
-rotate(LEFT, CLOCKWISE, 6);
-rotate(LEFT, CLOCKWISE, 6);	
-rotate(BACK, CLOCKWISE, 0);
-rotate(BACK, CLOCKWISE, 0);
-rotate(BACK, CLOCKWISE, 2);
-rotate(BACK, CLOCKWISE, 2);
-rotate(BACK, CLOCKWISE, 4);
-rotate(BACK, CLOCKWISE, 4);
-rotate(BACK, CLOCKWISE, 6);
-rotate(BACK, CLOCKWISE, 6);
-
-//rotate(BACK, CLOCKWISE, 0);
-//rotate(BACK, CLOCKWISE, 0);
-//rotate(BACK, CLOCKWISE, 0);
-//rotate(BACK, CLOCKWISE, 2);
-//rotate(BACK, CLOCKWISE, 4);
-//rotate(BACK, CLOCKWISE, num_layer-1);
+	
+rotate(BOTTOM, CLOCKWISE, 0);
 }
 
 void cube::layer_down()
@@ -140,9 +119,21 @@ void cube::rotate(int face, int rot, int offset)
 	int swap_level, swap_number;
 	
 	a = num_layer-1;
-	if(face == FRONT)
+	if(face == FRONT or face == RIGHT or face == TOP)
 	{
-		face = BACK;
+		switch(face)
+		{
+			case FRONT:
+				face = BACK;
+				break;
+			case RIGHT:
+				face = LEFT;
+				break;
+			case TOP:
+				face = BOTTOM;
+				break;
+		}
+		
 		offset = a-offset;
 		if(rot == CLOCKWISE)
 			rot = COUNTER_CLOCKWISE;
@@ -215,6 +206,33 @@ void cube::rotate(int face, int rot, int offset)
 					swap_pieces(pos[2], pos[1]);	
 				}
 			}
+			else if(face == BOTTOM)
+			{
+				pos[0] = (index[0]+index[1])+
+				         (offset)*num_layer+
+				         (index[0])*num_layer*num_layer;
+				pos[1] = (index[0])+
+				         (offset)*num_layer+
+				         (a-index[0]-index[1])*num_layer*num_layer;
+				pos[2] = (a-index[0]-index[1])+
+				         (offset)*num_layer+
+				         (a-index[0])*num_layer*num_layer;
+				pos[3] = (a-index[0])+
+				         (offset)*num_layer+
+				         (index[0]+index[1])*num_layer*num_layer;
+				if(rot == CLOCKWISE)
+				{
+					swap_pieces(pos[0], pos[1]);
+					swap_pieces(pos[1], pos[2]);
+					swap_pieces(pos[2], pos[3]);
+				}
+				else
+				{
+					swap_pieces(pos[0], pos[3]);
+					swap_pieces(pos[3], pos[2]);
+					swap_pieces(pos[2], pos[1]);	
+				}
+			}
 			index[1]++;
 			swap_number--;
 		}
@@ -230,9 +248,9 @@ void cube::rotate(int face, int rot, int offset)
 			{
 				a = x+y*num_layer+offset*num_layer*num_layer;
 				if(rot == COUNTER_CLOCKWISE)
-					cubes[cubes_index[a]].rot[2] = cubes[cubes_index[a]].rot[2]-90;
+					cubes[cubes_index[a]].mat.rotZ( 90);
 				else
-					cubes[cubes_index[a]].rot[2] = cubes[cubes_index[a]].rot[2]+90;
+					cubes[cubes_index[a]].mat.rotZ(-90);
 			}
 		}
 	}
@@ -244,9 +262,23 @@ void cube::rotate(int face, int rot, int offset)
 			{	
 				a = offset+y*num_layer+z*num_layer*num_layer;
 				if(rot == COUNTER_CLOCKWISE)
-					cubes[cubes_index[a]].rot[0] = cubes[cubes_index[a]].rot[0]-90;
+					cubes[cubes_index[a]].mat.rotX(-90);
 				else
-					cubes[cubes_index[a]].rot[0] = cubes[cubes_index[a]].rot[0]+90;
+					cubes[cubes_index[a]].mat.rotX( 90);
+			}
+		}
+	}
+	else if(face == BOTTOM)
+	{
+		for(x = 0; x<num_layer; x++)
+		{
+			for(z = 0; z<num_layer; z++)
+			{	
+				a = x+offset*num_layer+z*num_layer*num_layer;
+				if(rot == COUNTER_CLOCKWISE)
+					cubes[cubes_index[a]].mat.rotY(-90);
+				else
+					cubes[cubes_index[a]].mat.rotY( 90);
 			}
 		}
 	}

@@ -58,8 +58,19 @@ void *startTimer(void*)
 	render_thread  = true;
 	
 	render_init();
+float a[16]; 
+glGetFloatv(GL_MODELVIEW_MATRIX, a);
+
+cout << a[ 0] << "	" << a[ 1] << "	" << a[ 2] << "	" << a[ 3] << endl;
+cout << a[ 4] << "	" << a[ 5] << "	" << a[ 6] << "	" << a[ 7] << endl;
+cout << a[ 8] << "	" << a[ 9] << "	" << a[10] << "	" << a[11] << endl;
+cout << a[12] << "	" << a[13] << "	" << a[14] << "	" << a[15] << endl;
+
 	window_resize(resolution_x, resolution_y);
 	window_render();
+	
+glLoadIdentity();
+
 	while(render_thread == true)
 	{
 		time = SDL_GetTicks();

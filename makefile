@@ -5,8 +5,8 @@ EXEC = glcube
 
 all: $(EXEC) clean
 
-$(EXEC): src/cube.o src/camera.o src/render.o src/glcube.o
-	$(CC) -o bin/$(EXEC) src/cube.o src/camera.o src/render.o src/glcube.o $(LDFLAGS)
+$(EXEC): src/cube.o src/camera.o src/render.o src/matrix.o src/glcube.o
+	$(CC) -o bin/$(EXEC) src/cube.o src/camera.o src/render.o src/matrix.o src/glcube.o $(LDFLAGS)
 
 cube.o: src/cube.cpp
 	$(CC) -o src/cube.o -c src/cube.cpp $(CFLAGS)
@@ -16,6 +16,9 @@ camera.o: src/camera.cpp
 
 render.o: src/render.cpp
 	$(CC) -o src/render.o -c src/render.cpp  $(CFLAGS)
+
+matrix.o: src/matrix.cpp
+	$(CC) -o src/matrix.o -c src/matrix.cpp  $(CFLAGS)
 
 glcube.o: src/glcube.cpp
 	$(CC) -o src/glcube.o -c src/glcube.cpp  $(CFLAGS)

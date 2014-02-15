@@ -4,6 +4,7 @@
 #include <cmath>
 #include <new>
 
+#include "matrix.h"
 #include "global.h"
 
 enum piece_type
@@ -60,6 +61,7 @@ struct cubies
 	uint8_t pos[3];
 	uint8_t type;       //enum piece_type
 	uint8_t isrotating;
+	matrix mat;
 	
 	cubies()
 	{

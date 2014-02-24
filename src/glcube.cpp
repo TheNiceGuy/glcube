@@ -75,6 +75,24 @@ int main()
 					case SDLK_PAGEDOWN:
 						cube.layer_down();
 						break;
+					case SDLK_RIGHT:
+						cube.move_selection(NEXT);
+						break;
+					case SDLK_LEFT:
+						cube.move_selection(BACKWARD);
+						break;
+					case SDLK_UP:
+						cube.change_selection(NEXT);
+						break;
+					case SDLK_DOWN:
+						cube.change_selection(BACKWARD);
+						break;
+					case SDLK_z:
+						cube.rotate_selection(COUNTER_CLOCKWISE);
+						break;
+					case SDLK_x:
+						cube.rotate_selection(CLOCKWISE);
+						break;
 				}	
 				break;
 			

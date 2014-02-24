@@ -24,6 +24,17 @@
 #include "matrix.h"
 #include "global.h"
 
+enum action
+{
+	SET,
+	RESET
+};
+enum direction
+{
+	NEXT,
+	BACKWARD
+};
+
 enum piece_type
 {
 	CENTER,
@@ -49,39 +60,40 @@ enum rotation
 	COUNTER_CLOCKWISE
 };
 
-const uint8_t colorScheme[7][3] =  {{  0,   0,   0},  //0 Black
-									{255, 255, 255},  //1 White
-									{255, 255,   0},  //2 Yellow
-									{  0,   0, 255},  //3 Blue
-									{  0, 255,   0},  //4 Green
-									{255,   0,   0},  //5 red
-									{255, 155,   0}}; //6 Orange
+const uint8_t colorScheme[8][3] =  {{  0,   0,   0},  //0 plastic
+				    {255, 255, 255},  //1 White
+				    {255, 255,   0},  //2 Yellow
+				    {  0,   0, 255},  //3 Blue
+				    {  0, 255,   0},  //4 Green
+				    {255,   0,   0},  //5 red
+				    {255, 155,   0},  //6 Orange
+				    {  0, 255, 255}}; //7 selection
 const float CUBEVER[8][3]     =    {{-0.5,-0.5,-0.5},
-									{ 0.5,-0.5,-0.5},
-									{ 0.5, 0.5,-0.5},
-									{-0.5, 0.5,-0.5},
-									{-0.5,-0.5, 0.5},
-									{ 0.5,-0.5, 0.5},
-									{ 0.5, 0.5, 0.5},
-									{-0.5, 0.5, 0.5}};
+				    { 0.5,-0.5,-0.5},
+				    { 0.5, 0.5,-0.5},
+				    {-0.5, 0.5,-0.5},
+				    {-0.5,-0.5, 0.5},
+				    { 0.5,-0.5, 0.5},
+				    { 0.5, 0.5, 0.5},
+				    {-0.5, 0.5, 0.5}};
 const uint8_t CUBEFACE[6][4]    =  {{4, 5, 6, 7},
-									{0, 1, 2, 3},
-									{3, 2, 6, 7},
-									{0, 1, 5, 4},
-									{1, 2, 6, 5},
-									{0, 3, 7, 4}};
+				    {0, 1, 2, 3},
+				    {3, 2, 6, 7},
+				    {0, 1, 5, 4},
+				    {1, 2, 6, 5},
+				    {0, 3, 7, 4}};
 
 struct cubies
 {
+	bool is_selected;
 	uint8_t color[6];   //1, 2, 3, 4, 5, 6
-	int16_t rot[3];
 	uint8_t pos[3];
 	uint8_t type;       //enum piece_type
-	uint8_t isrotating;
 	matrix mat;
 	
 	cubies()
 	{
+		is_selected = false;
 		color[0] = 0;
 		color[1] = 0;
 		color[2] = 0;
@@ -89,7 +101,18 @@ struct cubies
 		color[4] = 0;
 		color[5] = 0;
 		type       = 0;
-		isrotating = 3;
+	}
+};
+
+struct layer
+{
+	uint8_t face;
+	uint8_t cur_layer;
+	
+	layer()
+	{
+		face      = BACK;
+		cur_layer = 0;
 	}
 };
 
@@ -104,7 +127,10 @@ class cube
 		void layer_up();
 		void layer_down();
 		void rotate(int face, int rot, int offset);
-
+		void move_selection(uint8_t direction);
+		void change_selection(uint8_t direction);
+		void rotate_selection(uint8_t direction);
+		
 		~cube();
 
 	private:
@@ -117,11 +143,13 @@ class cube
 		float side_rotation[6];
 		int *cubes_index;
 		cubies *cubes;
+		layer selection;
 
 		void draw_cube(int index);
 		void draw_guide();
-		void inset_square(float x[4], float y[4], float z[4]);
+		void inset_square(float x[4], float y[4], float z[4], bool sel);
 		void swap_pieces(int a, int b);
+		void detect_selection(int a);
 		
 		uint8_t test_piece(int x, int y, int z, int a);
 };

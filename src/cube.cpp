@@ -49,9 +49,7 @@ void cube::generate()
 		cubes[a].pos[0] = x;
 		cubes[a].pos[1] = y;
 		cubes[a].pos[2] = z;
-		cubes[a].rot[0] = 0;
-		cubes[a].rot[1] = 0;
-		cubes[a].rot[2] = 0;
+
 		cubes_index[a] = a;
 		
 		// set color
@@ -100,8 +98,8 @@ void cube::draw()
 		{
 			glPushMatrix();			
 			glTranslatef(-(num_layer/2.0)+cubes[a].pos[0],
-						 -(num_layer/2.0)+cubes[a].pos[1],
-						 -(num_layer/2.0)+cubes[a].pos[2]);
+			             -(num_layer/2.0)+cubes[a].pos[1],
+			             -(num_layer/2.0)+cubes[a].pos[2]);
 
 			glMultMatrixf(cubes[a].mat.mat);
 			//draw_guide();
@@ -117,6 +115,14 @@ void cube::layer_up()
 	generate();
 	
 rotate(BOTTOM, CLOCKWISE, 0);
+rotate(TOP, COUNTER_CLOCKWISE, 0);
+rotate(LEFT, CLOCKWISE, 0);
+rotate(RIGHT, COUNTER_CLOCKWISE, 0);
+rotate(BACK, CLOCKWISE, 0);
+rotate(FRONT, COUNTER_CLOCKWISE, 0);
+rotate(BOTTOM, CLOCKWISE, 0);
+rotate(TOP, COUNTER_CLOCKWISE, 0);
+	
 }
 
 void cube::layer_down()
@@ -172,7 +178,7 @@ void cube::rotate(int face, int rot, int offset)
 			if(face == BACK)
 			{
 				pos[0] = (index[0]+index[1])+
-                         (index[0])*num_layer+
+				         (index[0])*num_layer+
 				         (offset)*num_layer*num_layer;
 				pos[1] = (a-index[0])+
 				         (index[0]+index[1])*num_layer+
@@ -181,8 +187,8 @@ void cube::rotate(int face, int rot, int offset)
 				         (a-index[0])*num_layer+
 				         (offset)*num_layer*num_layer;
 				pos[3] = (index[0])+
-					     (a-index[0]-index[1])*num_layer+
-					     (offset)*num_layer*num_layer;
+				         (a-index[0]-index[1])*num_layer+
+				         (offset)*num_layer*num_layer;
 				if(rot == COUNTER_CLOCKWISE)
 				{
 					swap_pieces(pos[0], pos[1]);
@@ -209,7 +215,7 @@ void cube::rotate(int face, int rot, int offset)
 				         (a-index[0]-index[1])*num_layer*num_layer;
 				pos[3] = (offset)+
 				         (a-index[0]-index[1])*num_layer+
-						 (index[0])*num_layer*num_layer;
+				         (index[0])*num_layer*num_layer;
 				if(rot == CLOCKWISE)
 				{
 					swap_pieces(pos[0], pos[1]);
@@ -301,6 +307,68 @@ void cube::rotate(int face, int rot, int offset)
 	}
 }
 
+void cube::move_selection(uint8_t direction)
+{
+	detect_selection(RESET);
+	if(direction == NEXT)
+	{
+		selection.cur_layer = selection.cur_layer + 1;
+		if(selection.cur_layer == num_layer)
+			selection.cur_layer = 0;
+	}
+	else
+	{
+		selection.cur_layer = selection.cur_layer - 1;
+		if(selection.cur_layer == 255)
+			selection.cur_layer = num_layer-1;
+	}
+	detect_selection(SET);
+}
+
+void cube::change_selection(uint8_t direction)
+{
+	detect_selection(RESET);
+	if(direction == NEXT)
+	{
+		switch(selection.face)
+		{
+			case BACK:
+				selection.face = BOTTOM;
+				break;
+			case BOTTOM:
+				selection.face = LEFT;
+				break;
+			case LEFT:
+				selection.face = BACK;
+				break;
+		}
+	}
+	else
+	{
+		switch(selection.face)
+		{
+			case BACK:
+				selection.face = LEFT;
+				break;
+			case LEFT:
+				selection.face = BOTTOM;
+				break;
+			case BOTTOM:
+				selection.face = BACK;
+				break;
+		}
+	}
+	detect_selection(SET);
+}
+
+void cube::rotate_selection(uint8_t direction)
+{
+	if(direction == CLOCKWISE)
+		rotate(selection.face, CLOCKWISE, selection.cur_layer);
+	else
+		rotate(selection.face, COUNTER_CLOCKWISE, selection.cur_layer);
+}
+
 //////////////////////
 // private function //
 //////////////////////
@@ -328,9 +396,9 @@ void cube::draw_cube(int index)
 	
 	for(a=0; a<6; a++)
 	{
-		glColor3ub( colorScheme[cubes[index].color[a]][0],
-					colorScheme[cubes[index].color[a]][1],
-					colorScheme[cubes[index].color[a]][2]);
+		glColor3ub(colorScheme[cubes[index].color[a]][0],
+		           colorScheme[cubes[index].color[a]][1],
+		           colorScheme[cubes[index].color[a]][2]);
 
 		if(cubes[index].color[a] == 0)
 		{
@@ -349,7 +417,7 @@ void cube::draw_cube(int index)
 				y[b] = CUBEVER[CUBEFACE[a][b]][1];
 				z[b] = CUBEVER[CUBEFACE[a][b]][2];
 			}
-			inset_square(x, y, z);
+			inset_square(x, y, z, cubes[index].is_selected);
 		}
 	}
 }
@@ -369,7 +437,7 @@ void cube::draw_guide()
 	glEnd();
 }
 
-void cube::inset_square(float x[4], float y[4], float z[4])
+void cube::inset_square(float x[4], float y[4], float z[4], bool sel)
 {
 	int a;
 	float mar;
@@ -419,8 +487,21 @@ void cube::inset_square(float x[4], float y[4], float z[4])
 		glVertex3f(i[1][0], i[1][1], i[1][2]);
 		glVertex3f(i[2][0], i[2][1], i[2][2]);
 		glVertex3f(i[3][0], i[3][1], i[3][2]);
+		
 		//glEnd();draw_guide();glBegin(GL_QUADS);
-		glColor3ub(0,0,0);
+		if(sel == false)
+		{
+			glColor3ub(colorScheme[0][0],
+			           colorScheme[0][1],
+			           colorScheme[0][2]);
+		}
+		else
+		{
+			glColor3ub(colorScheme[7][0],
+			           colorScheme[7][1],
+			           colorScheme[7][2]);
+		}
+		
 		glVertex3f(x[0], y[0], z[0]);
 		glVertex3f(x[1], y[1], z[1]);
 		glVertex3f(i[1][0], i[1][1], i[1][2]);
@@ -496,7 +577,7 @@ uint8_t cube::test_piece(int x, int y, int z, int a)
 			c++;
 		if(z == 0 or z == num_layer-1)
 			c++;
-		
+
 		if(c == 3)
 			ptype = CORNER;
 		else if(c == 2)
@@ -523,8 +604,54 @@ void cube::swap_pieces(int a, int b)
 	}
 }
 
+void cube::detect_selection(int a)
+{
+	int x,y,z;
+	
+	if(selection.face == BACK)
+	{
+		z = selection.cur_layer;
+		for(x = 0; x<num_layer; x++)
+		{
+			for(y = 0; y<num_layer; y++)
+			{
+				if(a == SET)
+					cubes[cubes_index[x+(y*num_layer)+(z*num_layer*num_layer)]].is_selected = true;
+				else
+					cubes[cubes_index[x+(y*num_layer)+(z*num_layer*num_layer)]].is_selected = false;
+			}
+		}
+	}
+	else if(selection.face == LEFT)
+	{
+		x = selection.cur_layer;
+		for(y = 0; y<num_layer; y++)
+		{
+			for(z = 0; z<num_layer; z++)
+			{
+				if(a == SET)
+					cubes[cubes_index[x+(y*num_layer)+(z*num_layer*num_layer)]].is_selected = true;
+				else
+					cubes[cubes_index[x+(y*num_layer)+(z*num_layer*num_layer)]].is_selected = false;			}
+		}
+	}
+	else if(selection.face == BOTTOM)
+	{
+		y = selection.cur_layer;
+		for(x = 0; x<num_layer; x++)
+		{
+			for(z = 0; z<num_layer; z++)
+			{
+				if(a == SET)
+					cubes[cubes_index[x+(y*num_layer)+(z*num_layer*num_layer)]].is_selected = true;
+				else
+					cubes[cubes_index[x+(y*num_layer)+(z*num_layer*num_layer)]].is_selected = false;			}
+		}
+	}
+}
+
 cube::~cube()
 {
+  	free(cubes_index);
 	free(cubes);
-	free(cubes_index);
 }

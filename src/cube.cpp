@@ -1,19 +1,17 @@
-/////////////////////////////////////////////////////////////////////////
-//                                                                     //
-//  cube.cpp                                                           //
-//                                                                     //
-//  Copyright (c) 2013-2014 Gabriel-Andrew Pollo Guilbert              //
-//                          <gabriel14_wii@hotmail.com>                //
-//                                                                     //
-//                        All Rights Reserved                          //
-//                                                                     //
-//  This program is free software. It comes without  any warranty, to  //
-//  the extent permitted by  applicable law. You can  redistribute it  //
-//  and/or modify it under the terms of the Do What the Fuck You Want  //
-//  to  Public  License, Version 2, as  published by Sam Hocevar. See  //
-//  http://www.wtfpl.net/ for more details.                            //
-//                                                                     //
-/////////////////////////////////////////////////////////////////////////  
+/*
+ * cube.cpp
+ *
+ * Copyright (c) 2013-2014 Gabriel-Andrew Pollo Guilbert
+ *                         <gabriel14_wii@hotmail.com>
+ *
+ *                       All Rights Reserved
+ *
+ * This program is free software. It comes without  any warranty, to
+ * the extent permitted by  applicable law. You can  redistribute it
+ * and/or modify it under the terms of the Do What the Fuck You Want
+ * to  Public  License, Version 2, as  published by Sam Hocevar. See
+ * http://www.wtfpl.net/ for more details.
+ */
 
 #include "cube.h"
 
@@ -82,6 +80,7 @@ void cube::generate()
 		a++;
 	}
 	lock = false;
+	detect_selection(SET);
 }
 
 void cube::draw()
@@ -113,24 +112,17 @@ void cube::layer_up()
 {
 	num_layer = num_layer + 1;
 	generate();
-	
-rotate(BOTTOM, CLOCKWISE, 0);
-rotate(TOP, COUNTER_CLOCKWISE, 0);
-rotate(LEFT, CLOCKWISE, 0);
-rotate(RIGHT, COUNTER_CLOCKWISE, 0);
-rotate(BACK, CLOCKWISE, 0);
-rotate(FRONT, COUNTER_CLOCKWISE, 0);
-rotate(BOTTOM, CLOCKWISE, 0);
-rotate(TOP, COUNTER_CLOCKWISE, 0);
-	
+	detect_selection(SET);
 }
 
 void cube::layer_down()
 {
 	num_layer = num_layer - 1;
+	fix_selection();
 	if(num_layer <= 0)
 		num_layer = 1;
 	generate();
+	detect_selection(SET);
 }
 
 void cube::rotate(int face, int rot, int offset)
@@ -163,7 +155,7 @@ void cube::rotate(int face, int rot, int offset)
 		else
 			rot = CLOCKWISE;
 	}
-	if(offset == 0)
+	if(offset == 0 or offset == num_layer-1)
 		swap_level = floor(num_layer/2);
 	else
 		swap_level = 1;
@@ -650,8 +642,14 @@ void cube::detect_selection(int a)
 	}
 }
 
+void cube::fix_selection()
+{
+	if(selection.cur_layer > num_layer-1)
+		selection.cur_layer = num_layer-1;
+}
+
 cube::~cube()
 {
-  	free(cubes_index);
-	free(cubes);
+  	//free(cubes_index);
+	//free(cubes);
 }

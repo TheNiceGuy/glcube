@@ -1,19 +1,17 @@
-/////////////////////////////////////////////////////////////////////////
-//                                                                     //
-//  cube.h                                                             //
-//                                                                     //
-//  Copyright (c) 2013-2014 Gabriel-Andrew Pollo Guilbert              //
-//                          <gabriel14_wii@hotmail.com>                //
-//                                                                     //
-//                        All Rights Reserved                          //
-//                                                                     //
-//  This program is free software. It comes without  any warranty, to  //
-//  the extent permitted by  applicable law. You can  redistribute it  //
-//  and/or modify it under the terms of the Do What the Fuck You Want  //
-//  to  Public  License, Version 2, as  published by Sam Hocevar. See  //
-//  http://www.wtfpl.net/ for more details.                            //
-//                                                                     //
-/////////////////////////////////////////////////////////////////////////  
+/*
+ * cube.h
+ *
+ * Copyright (c) 2013-2014 Gabriel-Andrew Pollo Guilbert
+ *                         <gabriel14_wii@hotmail.com>
+ *
+ *                       All Rights Reserved
+ *
+ * This program is free software. It comes without  any warranty, to
+ * the extent permitted by  applicable law. You can  redistribute it
+ * and/or modify it under the terms of the Do What the Fuck You Want
+ * to  Public  License, Version 2, as  published by Sam Hocevar. See
+ * http://www.wtfpl.net/ for more details.
+ */
 
 #ifndef CUBE_H
 #define CUBE_H
@@ -150,7 +148,8 @@ class cube
 		void inset_square(float x[4], float y[4], float z[4], bool sel);
 		void swap_pieces(int a, int b);
 		void detect_selection(int a);
-		
+		void fix_selection();
+
 		uint8_t test_piece(int x, int y, int z, int a);
 };
 

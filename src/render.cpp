@@ -1,19 +1,17 @@
-/////////////////////////////////////////////////////////////////////////
-//                                                                     //
-//  render.cpp                                                         //
-//                                                                     //
-//  Copyright (c) 2013-2014 Gabriel-Andrew Pollo Guilbert              //
-//                          <gabriel14_wii@hotmail.com>                //
-//                                                                     //
-//                        All Rights Reserved                          //
-//                                                                     //
-//  This program is free software. It comes without  any warranty, to  //
-//  the extent permitted by  applicable law. You can  redistribute it  //
-//  and/or modify it under the terms of the Do What the Fuck You Want  //
-//  to  Public  License, Version 2, as  published by Sam Hocevar. See  //
-//  http://www.wtfpl.net/ for more details.                            //
-//                                                                     //
-/////////////////////////////////////////////////////////////////////////  
+/*
+ * render.cpp
+ *
+ * Copyright (c) 2013-2014 Gabriel-Andrew Pollo Guilbert
+ *                         <gabriel14_wii@hotmail.com>
+ *
+ *                       All Rights Reserved
+ *
+ * This program is free software. It comes without  any warranty, to
+ * the extent permitted by  applicable law. You can  redistribute it
+ * and/or modify it under the terms of the Do What the Fuck You Want
+ * to  Public  License, Version 2, as  published by Sam Hocevar. See
+ * http://www.wtfpl.net/ for more details.
+ */ 
 
 #include "render.h"
 
@@ -32,14 +30,15 @@ bool render_grid = true;
 
 void render_init()
 {
+	//Mix_Music *music = Mix_LoadMUS("sound/limbo.flac");
 	pthread_mutex_lock(&render_mutex);
-	if(SDL_Init(SDL_INIT_EVERYTHING) != 0)
+	if(SDL_Init(SDL_INIT_VIDEO) != 0)
 	{
-		printf("Unable to initialize SDL: %s", SDL_GetError());
+		printf("Unable to initialize SDL: %s\n", SDL_GetError());
 		exit(EXIT_FAILURE);
 	}
 	window = SDL_CreateWindow("GLCube", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-							  resolution_x, resolution_y, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+	                          resolution_x, resolution_y, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 	if(window == NULL)
 	{
 		printf("Can't create SDL window: %s\n", SDL_GetError());
@@ -67,6 +66,8 @@ void render_init()
 		printf("Can't initialize TTF: %s\n", TTF_GetError());
 		exit(EXIT_FAILURE);
 	}
+	
+	//Mix_PlayMusic(music, 0);
 }
 void *startTimer(void*)
 {

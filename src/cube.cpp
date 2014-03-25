@@ -95,10 +95,10 @@ void cube::draw()
 	{
 		if(cubes[a].type != UNDEF)
 		{
-			glPushMatrix();			
-			glTranslatef(-(num_layer/2.0)+cubes[a].pos[0],
-			             -(num_layer/2.0)+cubes[a].pos[1],
-			             -(num_layer/2.0)+cubes[a].pos[2]);
+			glPushMatrix();
+			glTranslatef(-(num_layer/2.0)+cubes[a].pos[0]+0.5,
+			             -(num_layer/2.0)+cubes[a].pos[1]+0.5,
+			             -(num_layer/2.0)+cubes[a].pos[2]+0.5);
 
 			glMultMatrixf(cubes[a].mat.mat);
 			//draw_guide();
